@@ -23,7 +23,7 @@ func NewServer(address string) *Grpc {
 }
 
 func (g *Grpc) SetHighScore(ctx context.Context, input *pbHighscore.SetHighScoreRequest) (*pbHighscore.SetHighScoreResponse, error) {
-	log.Info.Msg("SetHighScore in m-highscore was called")
+	log.Info().Msg("SetHighScore in m-highscore was called")
 	HighScore = input.GetHighScore()
 
 	return &pbHighscore.SetHighScoreResponse{
@@ -32,25 +32,25 @@ func (g *Grpc) SetHighScore(ctx context.Context, input *pbHighscore.SetHighScore
 }
 
 func (g *Grpc) GetHighScore(ctx context.Context, input *pbHighscore.GetHighScoreRequest) (*pbHighscore.GetHighScoreResponse, error) {
-	log.Info.Msg("GetHighScore in m-highscore was called")
+	log.Info().Msg("GetHighScore in m-highscore was called")
 	return &pbHighscore.GetHighScoreResponse{
 		HighScore: HighScore,
 	}, nil
 }
 
-func (g *Grpc) ListenAndServ() error {
+func (g *Grpc) ListenAndServe() error {
 	lst, err := net.Listen("tcp", g.address)
 	if err != nil {
 		return err
 	}
 
-	serverOpts := []grpc.ServerOptions{}
+	serverOpts := []grpc.ServerOption{}
 
-	g.srv = grpc.NewServer(serverOpts)
+	g.srv = grpc.NewServer(serverOpts...)
 
 	pbHighscore.RegisterGameServer(g.srv, g)
 
-	log.Info.Msg("Starting gRPC server for highscore at address:", g.address)
+	log.Info().Msg("Starting gRPC server for highscore at address: " + g.address)
 
 	err = g.srv.Serve(lst)
 	if err != nil {
